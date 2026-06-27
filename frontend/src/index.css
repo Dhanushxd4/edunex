@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    background-color: #EDE8DF;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #1A1A1A;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #CEC7BB; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9A8F82; }
+}
+
+@layer components {
+  .edunex-logo-edu  { font-family: 'Playfair Display', serif; font-weight: 800; color: #0D0D0D; }
+  .edunex-logo-nex  { font-family: 'Playfair Display', serif; font-weight: 800; color: #C9973A; font-style: italic; }
+  .page-title       { font-family: 'Playfair Display', serif; font-weight: 700; color: #0D0D0D; }
+  .card             { background: #F2EDE4; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .card-hover       { transition: box-shadow 0.2s, transform 0.2s; }
+  .card-hover:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.10); transform: translateY(-1px); }
+}

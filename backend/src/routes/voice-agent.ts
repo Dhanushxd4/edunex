@@ -1,0 +1,262 @@
+/**
+ * Edunex AI Voice Agent
+ * ─────────────────────
+ * Bridges Twilio Media Streams ↔ Gemini Live API for real-time
+ * two-way voice conversation with parents in Telugu / English.
+ *
+ * Audio pipeline:
+ *   Twilio → μ-law 8kHz → PCM 16kHz → Gemini Live
+ *   Gemini Live → PCM 24kHz → PCM 8kHz → μ-law → Twilio
+ */
+
+import http from 'http'
+import WebSocket, { WebSocketServer } from 'ws'
+
+// ── μ-law codec (pure JS, no native deps) ────────────────────────────────────
+
+function mulawDecode(u: number): number {
+  u = ~u & 0xff
+  const sign = u & 0x80
+  const exp  = (u >> 4) & 0x07
+  const mant = u & 0x0f
+  let   mag  = ((mant << 3) + 0x84) << exp
+  return sign ? -mag : mag
+}
+
+function mulawEncode(s: number): number {
+  const BIAS = 0x84
+  let sign = 0
+  if (s < 0) { sign = 0x80; s = -s }
+  if (s > 32767) s = 32767
+  s += BIAS
+  let exp = 7
+  for (let mask = 0x4000; (s & mask) === 0 && exp > 0; mask >>= 1, exp--) {}
+  const mant = (s >> (exp + 3)) & 0x0f
+  return (~(sign | (exp << 4) | mant)) & 0xff
+}
+
+/** Decode μ-law buffer → 16-bit PCM buffer (8 kHz) */
+function mulawToPcm(input: Buffer): Buffer {
+  const out = Buffer.alloc(input.length * 2)
+  for (let i = 0; i < input.length; i++) {
+    out.writeInt16LE(mulawDecode(input[i]), i * 2)
+  }
+  return out
+}
+
+/** Upsample PCM 8 kHz → 16 kHz (linear interpolation) */
+function upsample8to16(buf: Buffer): Buffer {
+  const n   = buf.length >> 1          // number of 16-bit samples
+  const out = Buffer.alloc(n * 4)      // double samples
+  for (let i = 0; i < n; i++) {
+    const s1 = buf.readInt16LE(i * 2)
+    const s2 = i + 1 < n ? buf.readInt16LE((i + 1) * 2) : s1
+    out.writeInt16LE(s1,                    i * 4)
+    out.writeInt16LE(Math.round((s1+s2)/2), i * 4 + 2)
+  }
+  return out
+}
+
+/** Downsample PCM 24 kHz → 8 kHz (keep every 3rd sample) */
+function downsample24to8(buf: Buffer): Buffer {
+  const n   = buf.length >> 1
+  const out = Buffer.alloc(Math.floor(n / 3) * 2)
+  let j = 0
+  for (let i = 0; i + 2 < n; i += 3) {
+    out.writeInt16LE(buf.readInt16LE(i * 2), j)
+    j += 2
+  }
+  return out
+}
+
+/** Encode 16-bit PCM buffer → μ-law buffer */
+function pcmToMulaw(buf: Buffer): Buffer {
+  const n   = buf.length >> 1
+  const out = Buffer.alloc(n)
+  for (let i = 0; i < n; i++) {
+    out[i] = mulawEncode(buf.readInt16LE(i * 2))
+  }
+  return out
+}
+
+// ── System prompt ─────────────────────────────────────────────────────────────
+
+function buildSystemPrompt(ctx: { studentName?: string; callType?: string; schoolName?: string }): string {
+  const school = ctx.schoolName ?? 'Edunex పాఠశాల'
+  const student = ctx.studentName ? `మీరు ${ctx.studentName} యొక్క తల్లిదండ్రులతో మాట్లాడుతున్నారు. ` : ''
+
+  return `మీరు ${school} యొక్క AI voice assistant — Edunex LMS ద్వారా పని చేస్తున్నారు.
+${student}
+మీ పాత్ర:
+- తల్లిదండ్రులకు వినమ్రంగా, స్నేహపూర్వకంగా సహాయం చేయడం
+- హాజరు, ఫీజులు, పరీక్షలు, బస్సు వివరాలు గురించి సమాచారం ఇవ్వడం
+- తెలుగులో మాట్లాడినప్పుడు తెలుగులో జవాబు ఇవ్వడం
+- ఇంగ్లీషులో మాట్లాడినప్పుడు ఇంగ్లీషులో జవాబు ఇవ్వడం
+
+నియమాలు:
+- చిన్న, స్పష్టమైన వాక్యాలు మాట్లాడండి (phone call కోసం)
+- మీకు తెలియని specifics గురించి పాఠశాల కార్యాలయాన్ని (school office) సంప్రదించమని చెప్పండి
+- మీరు AI అని తెలిసినా, సహాయకారిగా ఉండండి
+- Call type: ${ctx.callType ?? 'general'}`
+}
+
+// ── Voice Agent WebSocket setup ───────────────────────────────────────────────
+
+export function setupVoiceAgent(server: http.Server): void {
+  const wss = new WebSocketServer({ noServer: true })
+
+  // Attach to the HTTP server's upgrade event
+  server.on('upgrade', (req: http.IncomingMessage, socket, head) => {
+    if (req.url?.startsWith('/api/voice-agent/stream')) {
+      wss.handleUpgrade(req, socket, head, ws => wss.emit('connection', ws, req))
+    }
+  })
+
+  wss.on('connection', (twilioWs: WebSocket, req: http.IncomingMessage) => {
+    // Parse query params for context
+    const url    = new URL(req.url ?? '/', `http://x`)
+    const ctx    = {
+      studentName: url.searchParams.get('student') ?? undefined,
+      callType:    url.searchParams.get('type')    ?? 'general',
+      schoolName:  url.searchParams.get('school')  ?? undefined,
+    }
+
+    console.log(`🎙️ Voice agent connected — student: ${ctx.studentName ?? 'unknown'} type: ${ctx.callType}`)
+
+    let streamSid    = ''
+    let geminiWs: WebSocket | null = null
+    let audioBuffer  = Buffer.alloc(0)
+    const ACCUM      = 1600   // ~100 ms of μ-law at 8 kHz before forwarding
+
+    // ── Connect to Gemini Live ──────────────────────────────────────────────
+    const key = process.env.GEMINI_KEY ?? ''
+    const geminiUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${key}`
+
+    geminiWs = new WebSocket(geminiUrl)
+
+    geminiWs.on('open', () => {
+      console.log('🤖 Gemini Live connected')
+
+      // 1. Send setup
+      geminiWs!.send(JSON.stringify({
+        setup: {
+          model: 'models/gemini-2.0-flash-live-001',
+          generation_config: {
+            response_modalities: ['AUDIO'],
+            speech_config: {
+              voice_config: {
+                prebuilt_voice_config: { voice_name: 'Aoede' }
+              }
+            }
+          },
+          system_instruction: {
+            parts: [{ text: buildSystemPrompt(ctx) }]
+          }
+        }
+      }))
+    })
+
+    geminiWs.on('message', (data: WebSocket.RawData) => {
+      try {
+        const msg = JSON.parse(data.toString())
+
+        // ── Audio from Gemini → Twilio ──────────────────────────────────────
+        const parts: { inlineData?: { mimeType?: string; data?: string } }[] =
+          msg?.serverContent?.modelTurn?.parts ?? []
+
+        for (const part of parts) {
+          if (part?.inlineData?.mimeType?.startsWith('audio/pcm') && part.inlineData.data) {
+            const pcm24k = Buffer.from(part.inlineData.data, 'base64')
+            const pcm8k  = downsample24to8(pcm24k)
+            const mulaw  = pcmToMulaw(pcm8k)
+
+            // Send in 20 ms chunks (160 bytes) to Twilio
+            for (let i = 0; i < mulaw.length; i += 160) {
+              const chunk = mulaw.slice(i, Math.min(i + 160, mulaw.length))
+              if (twilioWs.readyState === WebSocket.OPEN && streamSid) {
+                twilioWs.send(JSON.stringify({
+                  event:     'media',
+                  streamSid,
+                  media:     { payload: chunk.toString('base64') }
+                }))
+              }
+            }
+          }
+        }
+
+        if (msg?.serverContent?.turnComplete) {
+          console.log('🤖 Gemini turn complete')
+        }
+
+        // Handle setup complete — send opening greeting
+        if (msg?.setupComplete) {
+          console.log('🤖 Gemini setup complete — sending greeting')
+        }
+
+      } catch { /* ignore JSON parse errors */ }
+    })
+
+    geminiWs.on('error', err => console.error('🤖 Gemini error:', (err as Error).message))
+    geminiWs.on('close', ()  => console.log('🤖 Gemini disconnected'))
+
+    // ── Messages from Twilio ────────────────────────────────────────────────
+    twilioWs.on('message', (data: WebSocket.RawData) => {
+      try {
+        const msg = JSON.parse(data.toString())
+
+        if (msg.event === 'start') {
+          streamSid = msg.start.streamSid
+          console.log(`🎙️ Stream started: ${streamSid}`)
+
+          // Send greeting text once stream is live
+          if (geminiWs?.readyState === WebSocket.OPEN) {
+            const greet = ctx.studentName
+              ? `నమస్కారం, మీరు ${ctx.studentName} యొక్క తల్లిదండ్రులతో మాట్లాడుతున్నారా? నేను Edunex AI assistant. మీకు ఎలా సహాయం చేయాలి?`
+              : 'నమస్కారం, నేను Edunex school AI assistant. మీకు ఎలా సహాయం చేయాలి?'
+
+            geminiWs.send(JSON.stringify({
+              client_content: {
+                turns: [{ role: 'user', parts: [{ text: `Please say: "${greet}"` }] }],
+                turn_complete: true
+              }
+            }))
+          }
+        }
+
+        if (msg.event === 'media' && geminiWs?.readyState === WebSocket.OPEN) {
+          // Accumulate μ-law chunks, convert and forward to Gemini
+          audioBuffer = Buffer.concat([audioBuffer, Buffer.from(msg.media.payload, 'base64')])
+
+          if (audioBuffer.length >= ACCUM) {
+            const chunk  = audioBuffer.slice(0, ACCUM)
+            audioBuffer  = audioBuffer.slice(ACCUM)
+            const pcm8k  = mulawToPcm(chunk)
+            const pcm16k = upsample8to16(pcm8k)
+
+            geminiWs.send(JSON.stringify({
+              realtime_input: {
+                media_chunks: [{
+                  data:      pcm16k.toString('base64'),
+                  mime_type: 'audio/pcm;rate=16000'
+                }]
+              }
+            }))
+          }
+        }
+
+        if (msg.event === 'stop') {
+          console.log('🎙️ Twilio stream stopped')
+          geminiWs?.close()
+        }
+
+      } catch { /* ignore */ }
+    })
+
+    twilioWs.on('close', () => {
+      console.log('🎙️ Twilio disconnected')
+      geminiWs?.close()
+    })
+  })
+
+  console.log('🎙️ Voice agent ready at /api/voice-agent/stream')
+}

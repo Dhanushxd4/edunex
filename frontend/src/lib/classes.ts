@@ -1,0 +1,66 @@
+// Full Indian school class list — Nursery to Class 12
+// Used across Students, Teachers, Exams, Attendance, etc.
+
+export const CLASS_LIST = [
+  'Nursery',
+  'LKG',
+  'UKG',
+  'Class 1',
+  'Class 1A',
+  'Class 1B',
+  'Class 1C',
+  'Class 2',
+  'Class 2A',
+  'Class 2B',
+  'Class 2C',
+  'Class 3',
+  'Class 3A',
+  'Class 3B',
+  'Class 3C',
+  'Class 4',
+  'Class 4A',
+  'Class 4B',
+  'Class 4C',
+  'Class 5',
+  'Class 5A',
+  'Class 5B',
+  'Class 5C',
+  'Class 6',
+  'Class 6A',
+  'Class 6B',
+  'Class 6C',
+  'Class 7',
+  'Class 7A',
+  'Class 7B',
+  'Class 7C',
+  'Class 8',
+  'Class 8A',
+  'Class 8B',
+  'Class 8C',
+  'Class 9',
+  'Class 9A',
+  'Class 9B',
+  'Class 9C',
+  'Class 10',
+  'Class 10A',
+  'Class 10B',
+  'Class 10C',
+  'Class 11',
+  'Class 11A',
+  'Class 11B',
+  'Class 11C',
+  'Class 12',
+  'Class 12A',
+  'Class 12B',
+  'Class 12C',
+]
+
+// For filter dropdowns (adds "All" at top)
+export const CLASS_FILTER_LIST = ['All', ...CLASS_LIST]
+
+// Short display names for compact UI
+export const CLASS_SHORT: Record<string, string> = {
+  Nursery: 'Nur',
+  LKG: 'LKG',
+  UKG: 'UKG',
+}
