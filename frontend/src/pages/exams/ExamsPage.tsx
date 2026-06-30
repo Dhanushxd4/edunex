@@ -50,7 +50,7 @@ export function ExamsPage() {
             <Sparkles className="h-4 w-4 text-gold" />
           </div>
           <h3 className="text-base font-semibold text-ink-0">AI Exam Generator</h3>
-          <Badge variant="gold">Powered by Gemini 2.0</Badge>
+          <Badge variant="gold">AI-Powered</Badge>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -135,7 +135,7 @@ export function ExamsPage() {
         <Card className="text-center py-12">
           <FileText className="h-10 w-10 text-ink-3 mx-auto mb-3" />
           <p className="text-sm font-medium text-ink-2">Configure the options above and click Generate Exam</p>
-          <p className="text-xs text-ink-3 mt-1">Uses Gemini 2.0 Flash via secure backend API</p>
+          <p className="text-xs text-ink-3 mt-1">Uses AI via secure backend API</p>
         </Card>
       )}
     </div>

@@ -194,7 +194,7 @@ export function AttendancePage() {
 
       {/* Info note */}
       <p className="text-xs text-ink-3 text-center">
-        Toggling a student absent automatically triggers a Twilio call to the parent
+        Toggling a student absent automatically triggers an AI voice call to the parent
       </p>
     </div>
   )

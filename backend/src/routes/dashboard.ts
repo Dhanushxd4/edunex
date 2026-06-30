@@ -40,7 +40,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 
     res.json({ success: true, data })
   } catch {
-    res.status(500).json({ success: false, error: 'Failed to load dashboard' })
+    res.status(500).json({ success: false, error: 'Failed to load dashboard data' })
   }
 })
 

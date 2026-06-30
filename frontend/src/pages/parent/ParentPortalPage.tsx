@@ -41,12 +41,12 @@ export function ParentPortalPage() {
 
   const { data, isLoading, refetch } = useQuery<ParentData>({
     queryKey: ['parent-me'],
-    queryFn: () => api.get('/api/parents/me').then((r: { data: { data: ParentData } }) => r.data.data),
+    queryFn: () => api.get('/parents/me').then((r: { data: { data: ParentData } }) => r.data.data),
   })
 
   const linkMutation = useMutation({
     mutationFn: (body: { studentName?: string; rollNumber?: string }) =>
-      api.patch('/api/parents/link-student', body),
+      api.patch('/parents/link-student', body),
     onSuccess: () => refetch(),
   })
 

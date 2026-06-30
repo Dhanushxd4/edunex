@@ -1,0 +1,24 @@
+At C:\Users\admin\Downloads\edunex\full-audit2.ps1:17 char:59
++         Write-Output "  ƒo. $label ƒ?" $($r.StatusCode) | $preview"
++                                                           ~~~~~~~~
+Expressions are only allowed as the first element of a pipeline.
+At C:\Users\admin\Downloads\edunex\full-audit2.ps1:17 char:67
++         Write-Output "  ƒo. $label ƒ?" $($r.StatusCode) | $preview"
++                                                                   ~
+Unexpected token '"
+    } catch {
+        $code = $null; try { $code = $_.Exception.Response.StatusCode.value__ } catch {}
+        $body2 = ''; try { $s = $_.Exception.Response.GetResponseStream(); $reader=[System.IO.StreamReader]::new($s); 
+$body2=$reader.ReadToEnd() } catch {}
+        Write-Output "' in expression or statement.
+At C:\Users\admin\Downloads\edunex\full-audit2.ps1:21 char:25
++         Write-Output "  ƒ?O $label ƒ?" $code | $body2"
++                         ~~~
+Unexpected token 'ƒ?O' in expression or statement.
+At C:\Users\admin\Downloads\edunex\full-audit2.ps1:22 char:6
++     }
++      ~
+The Try statement is missing its Catch or Finally block.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : ExpressionsMustBeFirstInPipeline
+ 

@@ -1,0 +1,18 @@
+=== EDUNEX AUDIT 12:35:33 ===
+LOGIN: 200 | token=eyJhbGciOiJIUzI1NiIs...
+/health => HTTP 200 | {"status":"ok","service":"Edunex API","timestamp":"2026-06-28T07:05:34.352Z","uptime":12324,"memory":"16MB","env":{"twilio":true,"gemini":true,"did":true,"supabase":true}}
+/api/students?limit=3 => HTTP 200 | {"success":true,"data":[],"meta":{"page":1,"limit":3,"total":0,"pages":0}}
+/api/teachers?limit=3 => HTTP 200 | {"success":true,"data":[],"meta":{"page":1,"limit":3,"total":0,"pages":0}}
+/api/dashboard/stats => HTTP 404 | {"success":false,"error":"Route not found"}
+/api/fees?limit=3 => HTTP 200 | {"success":true,"data":[]}
+/api/bus/routes => HTTP 200 | {"success":true,"data":[]}
+/api/enquiries?limit=3 => HTTP 200 | {"success":true,"data":[]}
+/api/parents?limit=3 => HTTP 404 | {"success":false,"error":"Route not found"}
+/api/calls/voice-agent-twiml?type=general => HTTP 200 | <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://edunex-api-production.up.railway.app/api/voice-agent/stream?type=general" />
+  </Connect>
+</Response>
+/api/ai/status => HTTP 404 | {"success":false,"error":"Route not found"}
+=== DONE ===

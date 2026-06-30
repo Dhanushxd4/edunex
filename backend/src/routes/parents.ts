@@ -146,7 +146,7 @@ router.post('/login', async (req: Request, res: Response) => {
       { expiresIn: '30d' },
     )
 
-    const schoolName = (parent.schools as { name: string } | null)?.name ?? ''
+    const schoolName = (parent.schools as { name: string }[] | null)?.[0]?.name ?? ''
 
     res.json({
       success: true,
@@ -247,9 +247,14 @@ router.patch('/link-student', requireAuth, async (req: AuthRequest, res: Respons
       return
     }
 
-    await supabase.from('parents').update({ student_id: student.id }).eq('id', req.userId!)
+        const { error } = await supabase
+      .from('parents')
+      .update({ student_id: student.id })
+      .eq('id', req.userId!)
 
-    res.json({ success: true, data: student })
+    if (error) throw error
+
+    res.json({ success: true, data: { student } })
   } catch {
     res.status(500).json({ success: false, error: 'Failed to link student' })
   }

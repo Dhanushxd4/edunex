@@ -61,7 +61,7 @@ export function HelpWidget() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-white">Edunex Assistant</p>
-              <p className="text-xs text-white/80">Powered by Gemini AI</p>
+              <p className="text-xs text-white/80">Smart AI Assistant</p>
             </div>
             <button onClick={() => setOpen(false)} className="text-white/80 hover:text-white transition-colors">
               <X className="h-4 w-4" />

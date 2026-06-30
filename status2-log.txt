@@ -1,0 +1,21 @@
+[ 8:44:11.74] 
+
+Workspace:       My Projects
+
+Project:         edunex-api
+Project ID:      4a8991d8-5407-4464-a553-ec1bb28c1df8
+
+Environment:     production
+Environment ID:  592e02bd-18f2-4790-841c-f96ad5803faa
+
+Linked service
+
+    Service:         None
+
+────────────────────────────────────────────────
+
+All resources
+
+    Services
+      - edunex-api: ● Online · Deploy failed (15m) · https://edunex-api-production.up.railway.app
+

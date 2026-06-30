@@ -98,20 +98,20 @@ export function BusPage() {
 
   const { data: routesData } = useQuery({
     queryKey: ['bus-routes'],
-    queryFn: () => api.get('/api/bus/routes').then((r: { data: unknown }) => r.data),
+    queryFn: () => api.get('/bus/routes').then((r: { data: unknown }) => r.data),
     refetchInterval: 30_000,
   })
   const routes: BusRoute[] = (routesData as { data?: BusRoute[] })?.data ?? []
 
   const { data: locsData } = useQuery({
     queryKey: ['bus-locations'],
-    queryFn: () => api.get('/api/bus/locations').then((r: { data: unknown }) => r.data),
+    queryFn: () => api.get('/bus/locations').then((r: { data: unknown }) => r.data),
     refetchInterval: 10_000,
   })
   const locations: BusLocation[] = (locsData as { data?: BusLocation[] })?.data ?? []
 
   const createRoute = useMutation({
-    mutationFn: (body: unknown) => api.post('/api/bus/routes', body),
+    mutationFn: (body: unknown) => api.post('/bus/routes', body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bus-routes'] })
       setShowAdd(false)
@@ -121,17 +121,17 @@ export function BusPage() {
   })
 
   const deleteRoute = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/bus/routes/${id}`),
+    mutationFn: (id: string) => api.delete(`/bus/routes/${id}`),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['bus-routes'] }); toast.success('Route deleted') },
   })
 
   const toggleStatus = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => api.patch(`/api/bus/routes/${id}`, { status }),
+    mutationFn: ({ id, status }: { id: string; status: string }) => api.patch(`/bus/routes/${id}`, { status }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['bus-routes'] }),
   })
 
   const sendLocation = useCallback((routeId: string, lat: number, lng: number, speed: number) => {
-    api.post('/api/bus/location', { route_id: routeId, lat, lng, speed }).catch(() => {})
+    api.post('/bus/location', { route_id: routeId, lat, lng, speed }).catch(() => {})
   }, [])
 
   function startTracking(routeId: string) {

@@ -1,0 +1,5 @@
+=== Deploy Status Check ===
+health    : 200 - {"status":"ok","service":"Edunex API","timestamp":"2026-06-28T12:42:29.984Z","uptime":827,"memory":"
+video GET : 401 - 
+bus GET   : 401 - 
+DONE

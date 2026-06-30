@@ -1,0 +1,10 @@
+=== Railway variables (FRONTEND_URL) ===
+error: unrecognized subcommand 'get'
+
+  tip: a similar subcommand exists: 'set'
+
+Usage: railway.exe variable [OPTIONS] [COMMAND]
+
+For more information, try '--help'.
+
+DONE

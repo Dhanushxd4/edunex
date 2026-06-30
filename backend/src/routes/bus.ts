@@ -132,10 +132,8 @@ router.get('/locations', async (req: AuthRequest, res: Response) => {
       .select('*, bus_routes(number, driver)')
       .eq('school_id', req.schoolId!)
     if (error) throw error
-    res.json({ success: true, data: data ?? [] })
-  } catch {
-    res.status(500).json({ success: false, error: 'Failed to get locations' })
-  }
+    res.json({ success: true, data: data })
+  } catch { res.status(500).json({ success: false, error: 'Failed to load locations' }) }
 })
 
 export default router

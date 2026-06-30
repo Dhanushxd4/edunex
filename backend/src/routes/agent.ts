@@ -120,7 +120,32 @@ router.get('/alarm', async (_req: Request, res: Response) => {
 
 // GET /api/agent/report — called by Vercel cron at 6:00 PM IST (12:30 PM UTC)
 router.get('/report', async (_req: Request, res: Response) => {
-  res.json({ success: true, data: { message: 'Daily report SMS sent to principals' } })
+  try {
+    const { data: schools } = await supabase
+      .from('schools')
+      .select('id, name, twilio_number, call_duration')
+      .eq('status', 'active')
+
+    let totalCalls = 0
+    for (const school of schools || []) {
+      const from = school.twilio_number || process.env.TWILIO_NUMBER!
+
+      const { data: students } = await supabase
+        .from('students')
+        .select('name, phone, cls')
+        .eq('school_id', school.id)
+
+      for (const student of students || []) {
+        const script = `నమస్కారం. ఇది ${school.name} నుండి. ${student.name} యొక్క నేటి హాజరు నివేదిక. వివరాల కోసు పోర్టల్ చెక్ చేయండి. ధన్యవాదాలు.`
+        await makeCall(student.phone, script, from, school.call_duration || 60)
+        totalCalls++
+      }
+    }
+
+    res.json({ success: true, data: { processed: totalCalls } })
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Report agent failed' })
+  }
 })
 
 export default router

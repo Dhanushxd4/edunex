@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Settings, Phone, FileText, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Input'
@@ -6,6 +6,8 @@ import { Card } from '@/components/ui/Card'
 import { Tabs } from '@/components/ui/Tabs'
 import { useAuthStore } from '@/store/auth.store'
 import { useToast } from '@/store/ui.store'
+import { api } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 
 const SCRIPT_TABS = [
   { id: 'absent', label: 'Absent Call' },
@@ -29,7 +31,22 @@ export function SettingsPage() {
   const [activeScriptTab, setActiveScriptTab] = useState('absent')
   const [scripts, setScripts] = useState(DEFAULT_SCRIPTS)
   const [callDuration, setCallDuration] = useState(60)
-  const [twilioNumber, setTwilioNumber] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [testingCall, setTestingCall] = useState(false)
+  const [testPhone, setTestPhone] = useState('')
+
+  // Load saved settings from backend
+  const { data: settingsData } = useQuery({
+    queryKey: ['school-settings'],
+    queryFn: () => api.get('/calls/settings').then((r) => r.data),
+  })
+
+  useEffect(() => {
+    if (settingsData) {
+      if (settingsData.scripts) setScripts({ ...DEFAULT_SCRIPTS, ...settingsData.scripts })
+      if (settingsData.call_duration) setCallDuration(settingsData.call_duration)
+    }
+  }, [settingsData])
 
   const preview = scripts[activeScriptTab]
     .replace('{studentName}', 'Arjun')
@@ -39,8 +56,35 @@ export function SettingsPage() {
     .replace('{amount}', '₹22,500')
     .replace('{date}', '10 June')
 
-  function save() {
-    toast.success('Settings saved')
+  async function save() {
+    setSaving(true)
+    try {
+      await api.put('/calls/settings', { scripts, call_duration: callDuration })
+      toast.success('Settings saved', 'Call scripts and duration updated')
+    } catch {
+      toast.error('Failed to save', 'Check connection and try again')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function testCall() {
+    if (!testPhone.trim()) { toast.error('Enter a phone number to test'); return }
+    setTestingCall(true)
+    try {
+      await api.post('/calls/make', {
+        phone: testPhone,
+        type: 'demo',
+        schoolName: user?.school_name,
+        script: scripts.demo,
+        duration: callDuration,
+      })
+      toast.success('Test call initiated', `Calling ${testPhone}`)
+    } catch (err) {
+      toast.error('Call failed', err instanceof Error ? err.message : 'Check Twilio credentials')
+    } finally {
+      setTestingCall(false)
+    }
   }
 
   return (
@@ -51,21 +95,26 @@ export function SettingsPage() {
           <Settings className="h-4 w-4 text-gold" /> School Profile
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <Input label="School Name"  defaultValue={user?.school_name ?? ''} />
-          <Input label="Principal"    defaultValue={user?.name ?? ''} />
-          <Input label="School Email" type="email" defaultValue={user?.email ?? ''} />
-          <Input label="Phone"        type="tel" placeholder="9876543210" />
+          <Input label="School Name"  defaultValue={user?.school_name ?? ''} disabled />
+          <Input label="Principal"    defaultValue={user?.name ?? ''} disabled />
+          <Input label="School Email" type="email" defaultValue={user?.email ?? ''} disabled />
         </div>
-        <Button variant="gold" size="sm" className="mt-4" onClick={save}>Save Profile</Button>
+        <p className="text-xs text-ink-3 mt-3">To update school name or principal, contact Edunex Super Admin.</p>
       </Card>
 
-      {/* Twilio */}
+      {/* Twilio / Call settings */}
       <Card>
         <h3 className="text-sm font-semibold text-ink-0 mb-4 flex items-center gap-2">
-          <Phone className="h-4 w-4 text-gold" /> Twilio Call Settings
+          <Phone className="h-4 w-4 text-gold" /> Call Settings
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <Input label="Twilio Number" placeholder="+91XXXXXXXXXX" value={twilioNumber} onChange={(e) => setTwilioNumber(e.target.value)} hint="Assigned by Edunex Super Admin" />
+          <Input
+            label="Test Phone Number"
+            placeholder="+91XXXXXXXXXX"
+            value={testPhone}
+            onChange={(e) => setTestPhone(e.target.value)}
+            hint="Send a test call to this number"
+          />
           <div>
             <label className="text-sm font-medium text-ink-2">Call Duration: {callDuration}s</label>
             <input
@@ -77,7 +126,12 @@ export function SettingsPage() {
             <div className="flex justify-between text-xs text-ink-3 mt-1"><span>30s</span><span>120s</span></div>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="mt-4" leftIcon={<Phone className="h-3.5 w-3.5" />}>Test Call</Button>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" size="sm" loading={testingCall} leftIcon={<Phone className="h-3.5 w-3.5" />} onClick={testCall}>
+            Send Test Call
+          </Button>
+          <Button variant="gold" size="sm" loading={saving} onClick={save}>Save Duration</Button>
+        </div>
       </Card>
 
       {/* Call scripts */}
@@ -103,13 +157,11 @@ export function SettingsPage() {
             </button>
           ))}
         </div>
-
-        {/* Preview */}
         <div className="mt-4 p-3 bg-cream-300 rounded-btn">
-          <p className="text-xs font-semibold text-ink-3 mb-1 flex items-center gap-1"><Eye className="h-3 w-3" /> Preview with sample data:</p>
+          <p className="text-xs font-semibold text-ink-3 mb-1 flex items-center gap-1"><Eye className="h-3 w-3" /> Preview:</p>
           <p className="text-sm text-ink-1">{preview}</p>
         </div>
-        <Button variant="gold" size="sm" className="mt-3" onClick={save}>Save Scripts</Button>
+        <Button variant="gold" size="sm" className="mt-3" loading={saving} onClick={save}>Save Scripts</Button>
       </Card>
     </div>
   )

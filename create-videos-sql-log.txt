@@ -1,0 +1,6 @@
+=== Trying PostgREST /rest/v1/sql (application/sql) ===
+FAILED (400): {"code":"PGRST102","details":null,"hint":null,"message":"Content-Type not acceptable: application/sql"}
+
+=== Verify videos table ===
+videos table: STILL MISSING (404)
+DONE

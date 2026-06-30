@@ -1,0 +1,52 @@
+=== Current env vars ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+> Environment Variables found for dhanushxd4s-projects/frontend [954ms]
+
+ name                       value               environments        created    
+ VITE_API_URL               Encrypted           Production          4d ago     
+ VITE_SUPABASE_ANON_KEY     Encrypted           Production          4d ago     
+ VITE_SUPABASE_URL          Encrypted           Production          4d ago     
+
+
+=== Removing old VITE_API_URL (if any) ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+Removing
+Removed Environment Variable [342ms]
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+Error: Environment Variable was not found.
+
+
+=== Adding VITE_API_URL for production ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+! VITE_ variables can be seen by anyone visiting your site
+Retrieving project…
+> Removed trailing newline from stdin input
+Saving…
+
+✓ Added           VITE_API_URL
+  Project         dhanushxd4s-projects/frontend
+  Environments    Production
+  Type            Sensitive
+
+=== Adding VITE_API_URL for preview ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+! VITE_ variables can be seen by anyone visiting your site
+Retrieving project…
+> Removed trailing newline from stdin input
+  Leave empty to apply to all Preview branches.
+? Git branch?[15G
+[?25h
+=== Final env list ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+> Environment Variables found for dhanushxd4s-projects/frontend [337ms]
+
+ name                       value               environments        created    
+ VITE_API_URL               Encrypted           Production          11s ago    
+ VITE_SUPABASE_ANON_KEY     Encrypted           Production          4d ago     
+ VITE_SUPABASE_URL          Encrypted           Production          4d ago     
+
+DONE

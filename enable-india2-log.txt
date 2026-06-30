@@ -1,0 +1,9 @@
+--- PATCH https://voice.twilio.com/v1/DialingPermissions/Countries/IN ---
+FAIL 405 : 
+--- PUT https://voice.twilio.com/v1/DialingPermissions/Countries/IN ---
+FAIL 405 : 
+--- POST https://voice.twilio.com/v1/DialingPermissions/BulkCountryUpdates ---
+FAIL 400 : 
+--- POST https://voice.twilio.com/v1/DialingPermissions/BulkCountryUpdates ---
+FAIL 400 : 
+DONE

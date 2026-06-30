@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { useToast } from '@/store/ui.store'
+import { api } from '@/lib/api'
 
 interface ParsedRow {
   name: string
@@ -68,11 +69,18 @@ export function ImportPage() {
   }
 
   async function doImport() {
+    if (!rows.length) return
     setImporting(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    setImporting(false)
-    setDone(true)
-    toast.success('Import successful', `${rows.length} students added`)
+    try {
+      const res = await api.post('/students/bulk', { students: rows })
+      const count = res.data?.data?.inserted ?? rows.length
+      setDone(true)
+      toast.success('Import successful', `${count} students added to database`)
+    } catch (err) {
+      toast.error('Import failed', err instanceof Error ? err.message : 'Check CSV format and try again')
+    } finally {
+      setImporting(false)
+    }
   }
 
   return (

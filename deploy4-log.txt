@@ -1,0 +1,5 @@
+=== Deploy with explicit project ID ===
+DIR: C:\Users\admin\Downloads\edunex
+No environment specified. Set RAILWAY_ENVIRONMENT_ID, use --environment, or run `railway environment` to link one.
+EXIT: 0
+DONE

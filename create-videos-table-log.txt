@@ -1,0 +1,9 @@
+=== Trying exec_sql RPC ===
+exec_sql failed (404): {"code":"PGRST202","details":"Searched for the function public.exec_sql with parameter query or with a single unnamed json/jsonb parameter, but no matches were found in the schema cache.","hint":null,"message":"Could not find the function public.exec_sql(query) in the schema cache"}
+
+=== Trying pg/query endpoint ===
+pg/query failed (404): 
+
+=== Verify videos table ===
+videos table: STILL MISSING (404)
+DONE

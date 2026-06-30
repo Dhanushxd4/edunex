@@ -65,7 +65,7 @@ router.patch('/:studentId/pay', async (req: AuthRequest, res: Response) => {
 
     res.json({ success: true })
   } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to mark as paid' })
+    res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Payment error' })
   }
 })
 

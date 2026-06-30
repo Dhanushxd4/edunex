@@ -1,0 +1,10 @@
+=== Current India permissions ===
+{"continent": "Asia", "country_codes": ["91"], "high_risk_special_numbers_enabled": false, "high_risk_tollfraud_numbers_enabled": false, "iso_code": "IN", "links": {"highrisk_special_prefixes": "https://voice.twilio.com/v1/DialingPermissions/Countries/IN/HighRiskSpecialPrefixes"}, "low_risk_numbers_enabled": true, "name": "India", "url": "https://voice.twilio.com/v1/DialingPermissions/Countries/IN"}
+
+=== Enabling High Risk (IRSF) for India ===
+POST error: The remote server returned an error: (405) Method Not Allowed.
+
+
+=== Trying bulk update approach ===
+Bulk error: The remote server returned an error: (400) Bad Request.
+

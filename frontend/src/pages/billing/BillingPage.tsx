@@ -103,7 +103,7 @@ export function BillingPage() {
       </div>
 
       <Card className="text-center">
-        <p className="text-sm text-ink-2">All plans include Supabase cloud sync, Twilio integration, and Edunex support.</p>
+        <p className="text-sm text-ink-2">All plans include cloud sync, AI voice calls, and Edunex support.</p>
         <p className="text-xs text-ink-3 mt-1">GST applicable. Annual plans available with 20% discount.</p>
       </Card>
     </div>

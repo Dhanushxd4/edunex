@@ -1,0 +1,6 @@
+=== Setting edunexapp.vercel.app ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Assigning alias edunexapp.vercel.app to frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app
+Creating alias
+> Success! https://edunexapp.vercel.app now points to frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app [2s]
+DONE

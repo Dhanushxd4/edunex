@@ -126,39 +126,99 @@ router.post('/sms', requireAuth, async (req: AuthRequest, res: Response) => {
   }
 })
 
-// POST /api/calls/broadcast — bulk SMS to multiple numbers
+
+// GET /api/calls/settings — load call scripts + duration from Supabase Storage
+router.get('/settings', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const path = `${req.schoolId}/settings.json`
+    const { data, error } = await supabase.storage.from('school-settings').download(path)
+    if (error || !data) {
+      res.json({ success: true, data: { scripts: {}, call_duration: 60 } })
+      return
+    }
+    const text = await data.text()
+    res.json({ success: true, data: JSON.parse(text) })
+  } catch {
+    res.json({ success: true, data: { scripts: {}, call_duration: 60 } })
+  }
+})
+
+// PUT /api/calls/settings — save call scripts + duration to Supabase Storage
+router.put('/settings', requireAuth, async (req: AuthRequest, res: Response) => {
+  try {
+    const { scripts, call_duration } = req.body as { scripts: Record<string, string>; call_duration: number }
+    const path    = `${req.schoolId}/settings.json`
+    const payload = JSON.stringify({ scripts, call_duration, updated_at: new Date().toISOString() })
+    const blob    = new Blob([payload], { type: 'application/json' })
+    const { error } = await supabase.storage.from('school-settings').upload(path, blob, {
+      upsert: true,
+      contentType: 'application/json',
+    })
+    if (error) throw error
+    res.json({ success: true })
+  } catch (err) {
+    res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Failed to save settings' })
+  }
+})
+
+// ── Broadcast ─────────────────────────────────────────────────────────────────
+
+// POST /api/calls/broadcast (alerts page) — call all school parents
 router.post('/broadcast', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { phones, message } = req.body as { phones: string[]; message: string }
+    const { message, channel = 'both' } = req.body as { message: string; channel?: string }
+    if (!message?.trim()) {
+      res.status(400).json({ success: false, error: 'Message is required' })
+      return
+    }
 
-    if (!phones?.length || !message) {
-      res.status(400).json({ success: false, error: 'Phones array and message are required' })
+    const { data: students } = await supabase
+      .from('students')
+      .select('name, phone, parent')
+      .eq('school_id', req.schoolId!)
+      .not('phone', 'is', null)
+
+    if (!students?.length) {
+      res.json({ success: true, data: { sent: 0, message: 'No students with phone numbers found' } })
       return
     }
 
     const { data: school } = await supabase
       .from('schools')
-      .select('twilio_number')
+      .select('name, twilio_number')
       .eq('id', req.schoolId!)
       .single()
 
     const fromNumber = school?.twilio_number || process.env.TWILIO_NUMBER!
+    const schoolName = school?.name || 'Your School'
+
+    let sent = 0
     const client = getTwilioClient()
 
-    const results = await Promise.allSettled(
-      phones.map((phone) =>
-        client.messages.create({
-          from: fromNumber,
-          to:   sanitizePhone(phone),
-          body: message,
+    // Fire calls in batches of 5 (Twilio rate limit)
+    const chunks: typeof students[] = []
+    for (let i = 0; i < students.length; i += 5) chunks.push(students.slice(i, i + 5))
+
+    for (const chunk of chunks) {
+      await Promise.allSettled(
+        chunk.map(async (student) => {
+          try {
+            if (channel === 'call' || channel === 'both') {
+              const script = `${message} - This message is from ${schoolName}.`
+              await client.calls.create({
+                from: fromNumber,
+                to: sanitizePhone(student.phone),
+                twiml: `<Response><Say language="te-IN" voice="Google.te-IN-Standard-A">${script}</Say></Response>`,
+                timeout: 30,
+              })
+            }
+            sent++
+          } catch { /* skip failed numbers */ }
         }),
-      ),
-    )
+      )
+    }
 
-    const sent   = results.filter((r) => r.status === 'fulfilled').length
-    const failed = results.filter((r) => r.status === 'rejected').length
-
-    res.json({ success: true, data: { sent, failed, total: phones.length } })
+    res.json({ success: true, data: { sent, total: students.length } })
   } catch (err) {
     res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Broadcast failed' })
   }
@@ -232,7 +292,7 @@ router.get('/voice-agent-twiml', (req: Request, res: Response) => {
 
 // POST /api/calls/voice-agent-status — Twilio status callback
 router.post('/voice-agent-status', (req: Request, res: Response) => {
-  console.log(`📞 Voice agent call status: ${req.body.CallStatus} — SID: ${req.body.CallSid}`)
+  console.log('📞 Voice agent call status:', req.body?.CallStatus, req.body?.CallSid)
   res.sendStatus(200)
 })
 

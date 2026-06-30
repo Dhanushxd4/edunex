@@ -124,9 +124,7 @@ router.patch('/:id/attendance', async (req: AuthRequest, res: Response) => {
       .single()
     if (error) throw error
     res.json({ success: true, data })
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Failed to update attendance' })
-  }
+  } catch { res.status(500).json({ success: false, error: 'Failed to update student' }) }
 })
 
 export default router

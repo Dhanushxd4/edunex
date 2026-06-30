@@ -23,7 +23,9 @@ import enquiryRoutes   from './routes/enquiries'
 import adminRoutes     from './routes/admin'
 import busRoutes       from './routes/bus'
 import parentRoutes    from './routes/parents'
+import videoRoutes     from './routes/video'
 import { setupVoiceAgent } from './routes/voice-agent'
+import courseRoutes from './routes/courses'
 import { errorHandler } from './middleware/errorHandler'
 
 const app  = express()
@@ -44,10 +46,11 @@ app.set('trust proxy', 1)
 
 // ── Security middleware ───────────────────────────────────────────────────────
 app.use(helmet())
+// Allow all origins — LMS is accessed from multiple Vercel preview URLs
 app.use(cors({
-  origin:      process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: true,
   credentials: true,
-  methods:     ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }))
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
@@ -57,6 +60,7 @@ const apiLimiter = rateLimit({
   max:      300,
   standardHeaders: true,
   legacyHeaders:   false,
+  validate:        { xForwardedForHeader: false },
   skip: (req) => req.path === '/health',  // never throttle health checks
   message: { success: false, error: 'Too many requests. Please wait and try again.' },
 })
@@ -65,6 +69,7 @@ const apiLimiter = rateLimit({
 const aiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max:      30,
+  validate: { xForwardedForHeader: false },
   message: { success: false, error: 'AI rate limit reached. Try again in a minute.' },
 })
 
@@ -72,6 +77,7 @@ const aiLimiter = rateLimit({
 const callLimiter = rateLimit({
   windowMs: 60 * 1000,
   max:      20,
+  validate: { xForwardedForHeader: false },
   message: { success: false, error: 'Too many calls in one minute.' },
 })
 
@@ -117,6 +123,8 @@ app.use('/api/agent',     agentRoutes)
 app.use('/api/admin',     adminRoutes)
 app.use('/api/bus',       busRoutes)
 app.use('/api/parents',  parentRoutes)
+app.use('/api/video',    videoRoutes)
+app.use('/api/courses',  courseRoutes)
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {
@@ -150,9 +158,13 @@ function shutdown(signal: string) {
     console.log('Server closed. Goodbye.')
     process.exit(0)
   })
-  setTimeout(() => { console.error('Forced exit after 10 s'); process.exit(1) }, 10_000)
+  setTimeout(() => { console.error('Forced exit after 10s'); process.exit(1) }, 10000)
 }
+
 process.on('SIGTERM', () => shutdown('SIGTERM'))
 process.on('SIGINT',  () => shutdown('SIGINT'))
 
-export default app
+// Prevent ValidationError from express-rate-limit crashing the process
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason)
+})

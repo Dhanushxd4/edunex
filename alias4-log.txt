@@ -1,0 +1,10 @@
+=== Remove old alias first ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Success! Alias edunex-portal.vercel.app removed [514ms]
+
+=== Setting edunex-portal.vercel.app using public source ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Assigning alias edunex-portal.vercel.app to frontend-chi-blush-72.vercel.app
+Creating alias
+> Success! https://edunex-portal.vercel.app now points to frontend-chi-blush-72.vercel.app [3s]
+DONE

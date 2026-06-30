@@ -50,7 +50,7 @@ router.post('/public/:schoolId', async (req: AuthRequest, res: Response) => {
     // Also add to enquiries
     await supabase.from('enquiries').insert({ school_id: schoolId, name: `${child_name} (${parent_name})`, phone, cls: class_applied || '', source: 'online', status: 'new' })
     res.status(201).json({ success: true, data })
-  } catch { res.status(500).json({ success: false, error: 'Failed to submit application' }) }
+  } catch { res.status(500).json({ success: false, error: 'Failed tosubmit enquiry' }) }
 })
 
 export default router

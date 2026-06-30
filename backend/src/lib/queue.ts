@@ -41,4 +41,4 @@ class AsyncQueue {
 // Separate queues per external API — keep them from blocking each other
 export const geminiQueue = new AsyncQueue(8)   // 8 concurrent Gemini calls
 export const twilioQueue = new AsyncQueue(20)  // Twilio handles higher concurrency
-export const didQueue    = new AsyncQueue(3)   // D-ID is slow, keep low
+export const didQueue    = new AsyncQueue(10)  // D-ID API concurrency

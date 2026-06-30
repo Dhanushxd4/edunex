@@ -113,7 +113,7 @@ export function VideoPage() {
         <div className="flex items-center gap-2 mb-4">
           <div className="p-1.5 bg-gold-muted rounded-btn"><Video className="h-4 w-4 text-gold" /></div>
           <h3 className="text-base font-semibold text-ink-0">AI Talking Video</h3>
-          <Badge variant="gold">Powered by D-ID</Badge>
+          <Badge variant="gold">AI Avatar</Badge>
         </div>
 
         {/* Photo upload */}

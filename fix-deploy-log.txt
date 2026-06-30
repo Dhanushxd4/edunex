@@ -1,0 +1,6 @@
+=== Fix Deploy: TypeScript error fixed in parents.ts ===
+Running from: C:\Users\admin\Downloads\edunex\backend
+
+Pushed to: C:\Users\admin\Downloads\edunex\backend
+No linked project found. Run railway link to connect to a project
+  → Run `railway link` to connect to a project.

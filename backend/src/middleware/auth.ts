@@ -32,6 +32,6 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
     req.role     = payload.role
     next()
   } catch {
-    res.status(401).json({ success: false, error: 'Invalid or expired token' })
+    res.status(401).json({ success: false, error: 'Invalid token' })
   }
 }

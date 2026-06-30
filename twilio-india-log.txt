@@ -1,0 +1,12 @@
+=== GET India current permissions ===
+GET: 200 - {"continent": "Asia", "country_codes": ["91"], "high_risk_special_numbers_enabled": false, "high_risk_tollfraud_numbers_enabled": false, "iso_code": "IN", "links": {"highrisk_special_prefixes": "https://voice.twilio.com/v1/DialingPermissions/Countries/IN/HighRiskSpecialPrefixes"}, "low_risk_numbers_enabled": true, "name": "India", "url": "https://voice.twilio.com/v1/DialingPermissions/Countries/IN"}
+
+=== POST to enable India (all risk levels) ===
+POST failed (405): 
+
+=== Try PATCH ===
+PATCH failed (405): 
+
+=== Try BulkCountryUpdates ===
+Bulk failed (400): 
+DONE

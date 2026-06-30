@@ -6,6 +6,7 @@ import { Textarea, Select } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { useToast } from '@/store/ui.store'
+import { api } from '@/lib/api'
 
 const TEMPLATES = [
   { id: 'holiday',  label: 'Holiday Notice', en: 'Dear Parent, school will remain closed on {date} due to {reason}. Classes resume on {next_date}.', te: 'ప్రియమైన తల్లిదండ్రులకు, పాఠశాల {date} న {reason} కారణంగా మూసివేయబడుతుంది.' },
@@ -34,10 +35,16 @@ export function AlertsPage() {
   async function send() {
     if (!message.trim()) { toast.error('Message cannot be empty'); return }
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 1500))
-    setLoading(false)
-    setMessage('')
-    toast.success('Alert sent!', `Delivered to all parents via ${channel}`)
+    try {
+      const res = await api.post('/calls/broadcast', { message, channel })
+      const count = res.data?.sent ?? 0
+      setMessage('')
+      toast.success('Alert sent!', `Broadcast to ${count} parents via ${channel}`)
+    } catch {
+      toast.error('Failed to send', 'Check backend connection')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -1,0 +1,8 @@
+=== Testing bus_routes table ===
+bus_routes: OK (200) - []
+=== Testing videos table ===
+videos: FAIL 404 - {"code":"PGRST205","details":null,"hint":"Perhaps you meant the table 'public.students'","message":"Could not find the table 'public.videos' in the schema cache"}
+DONE
+Indexing...
+Uploading...
+  Build Logs: https://railway.com/project/4a8991d8-5407-4464-a553-ec1bb28c1df8/service/fb5378fd-27d2-4442-a496-5ca9b1f1576e?id=e77ae27a-bd76-49c5-a55f-f3c9d7500d09&

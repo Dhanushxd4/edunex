@@ -1,0 +1,95 @@
+=== Deploying with new production alias ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+Deploying dhanushxd4s-projects/frontend
+Uploading [--------------------] (0.0B/505.3KB)
+Uploading [=====---------------] (127.3KB/505.3KB)
+Uploading [==========----------] (258.1KB/505.3KB)
+Uploading [===============-----] (383.1KB/505.3KB)
+Uploading [====================] (505.3KB/505.3KB)
+  Inspect         https://vercel.com/dhanushxd4s-projects/frontend/7ooD6wRJphDNfYzGb6U8B7uqx4Ms
+  Production      https://frontend-b705g596v-dhanushxd4s-projects.vercel.app
+https://frontend-b705g596v-dhanushxd4s-projects.vercel.appBuilding…
+Building…
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 2 cores, 8 GB
+Retrieving list of deployment files...
+Downloading 135 deployment files...
+Restored build cache from previous deployment (68LYj7mGdcALb9nVcNtC9o17D7qp)
+Running "vercel build"
+Vercel CLI 54.17.2
+Installing dependencies...
+up to date in 1s
+72 packages are looking for funding
+run `npm fund` for details
+> frontend@0.0.0 build
+> tsc -b && vite build
+vite v8.0.15 building client environment for production...
+transforming...✓ 2897 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                             0.55 kB │ gzip:   0.33 kB
+dist/assets/index-DhxVKRkW.css             33.85 kB │ gzip:   7.07 kB
+dist/assets/check-D0eVoh0c.js               0.12 kB │ gzip:   0.14 kB
+dist/assets/plus-tIZIExRk.js                0.15 kB │ gzip:   0.15 kB
+dist/assets/arrow-right-Cg4NMW4I.js         0.16 kB │ gzip:   0.16 kB
+dist/assets/clock-EfDCFUWN.js               0.16 kB │ gzip:   0.16 kB
+dist/assets/search-C9SBeKK6.js              0.17 kB │ gzip:   0.17 kB
+dist/assets/play-DTCxsUSI.js                0.19 kB │ gzip:   0.18 kB
+dist/assets/mail-BQOlShWt.js                0.21 kB │ gzip:   0.20 kB
+dist/assets/link-2-Dm_PCJ73.js              0.24 kB │ gzip:   0.21 kB
+dist/assets/eye-DIq2yLnA.js                 0.25 kB │ gzip:   0.20 kB
+dist/assets/map-pin-9XagjIw2.js             0.25 kB │ gzip:   0.22 kB
+dist/assets/user-x-BsvGIcLi.js              0.30 kB │ gzip:   0.23 kB
+dist/assets/trash-2-Bm6NXSUr.js             0.32 kB │ gzip:   0.21 kB
+dist/assets/phone-call-B6vnfk2C.js          0.42 kB │ gzip:   0.27 kB
+dist/assets/eye-off-Bh8iRwcn.js             0.43 kB │ gzip:   0.27 kB
+dist/assets/star-Bn1uzX0B.js                0.47 kB │ gzip:   0.29 kB
+dist/assets/classes-DRc8phB7.js             0.49 kB │ gzip:   0.19 kB
+dist/assets/Tabs-Ct2of6oq.js                0.71 kB │ gzip:   0.45 kB
+dist/assets/Card-D2iZXd2E.js                1.10 kB │ gzip:   0.57 kB
+dist/assets/Modal-CAjTmaVi.js               2.13 kB │ gzip:   0.97 kB
+dist/assets/useMutation-OyTJGQRK.js         2.25 kB │ gzip:   0.94 kB
+dist/assets/MarksPage-B1Rlb81-.js           2.32 kB │ gzip:   1.08 kB
+dist/assets/Input-DZVcu3j1.js               2.82 kB │ gzip:   0.81 kB
+dist/assets/DemoPage-lpCTcPWn.js            2.96 kB │ gzip:   1.40 kB
+dist/assets/BillingPage-LYoDJEIn.js         3.14 kB │ gzip:   1.37 kB
+dist/assets/AdmissionPage-Cs-LAgtL.js       3.66 kB │ gzip:   1.62 kB
+dist/assets/EnquiryPage-DCa9dVhE.js         3.90 kB │ gzip:   1.58 kB
+dist/assets/LoginPage-aQRyYY36.js           4.27 kB │ gzip:   1.78 kB
+dist/assets/ImportPage-DXjKG4CS.js          4.42 kB │ gzip:   1.78 kB
+dist/assets/AlertsPage-Ccq8-k5P.js          4.57 kB │ gzip:   1.91 kB
+dist/assets/AgentPage-ijx0pqOh.js           4.76 kB │ gzip:   1.78 kB
+dist/assets/SettingsPage-DXZET_55.js        4.87 kB │ gzip:   1.78 kB
+dist/assets/SuperAdminPage-sNOCx3lD.js      4.98 kB │ gzip:   1.96 kB
+dist/assets/CoursesPage-B4sbUk_c.js         4.99 kB │ gzip:   1.78 kB
+dist/assets/FeesPage-D15cLiXx.js            5.24 kB │ gzip:   2.01 kB
+dist/assets/AttendancePage-r6I4NOyc.js      5.26 kB │ gzip:   1.87 kB
+dist/assets/ExamsPage-CXr-gjTf.js           5.27 kB │ gzip:   1.99 kB
+dist/assets/VideoPage-DDspYYIO.js           6.15 kB │ gzip:   2.57 kB
+dist/assets/DashboardPage-BlOuxn7A.js       6.19 kB │ gzip:   2.18 kB
+dist/assets/ParentLoginPage-CNOiGSBx.js     6.62 kB │ gzip:   2.04 kB
+dist/assets/StudentsPage-D-csc39a.js        6.77 kB │ gzip:   2.24 kB
+dist/assets/TeachersPage-BBo5Y6QD.js        7.43 kB │ gzip:   2.69 kB
+dist/assets/RegisterPage-BYoZAOnR.js        8.31 kB │ gzip:   2.88 kB
+dist/assets/useQuery-BYlq2Z7O.js            8.79 kB │ gzip:   3.22 kB
+dist/assets/createLucideIcon-kUaRng_O.js    9.98 kB │ gzip:   3.95 kB
+dist/assets/BusPage-IVWuq_i-.js            10.15 kB │ gzip:   3.82 kB
+dist/assets/ParentPortalPage-CqBPTaJ7.js   10.27 kB │ gzip:   2.81 kB
+dist/assets/LandingPage-itDsmzKd.js        20.22 kB │ gzip:   5.82 kB
+dist/assets/AnalyticsPage-CYn-3gaa.js     381.21 kB │ gzip: 110.47 kB
+dist/assets/index-B8i_JTwM.js             679.31 kB │ gzip: 206.38 kB
+✓ built in 2.13s
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+Build Completed in /vercel/output [11s]
+Deploying outputs...
+[2K[1A[2K[G  Production      https://frontend-b705g596v-dhanushxd4s-projects.vercel.app
+Completing…
+▲ Aliased         https://edunex-dhanush.vercel.app
+
+✓ Ready in 21s
+DONE

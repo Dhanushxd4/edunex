@@ -1,0 +1,41 @@
+=== Current aliases ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Fetching aliases under dhanushxd4s-projects
+> aliases found under dhanushxd4s-projects [1s]
+  source                                                   url                                                     age    
+  edunex-klwdcv7fi-dhanushxd4s-projects.vercel.app         edunex-git-master-dhanushxd4s-projects.vercel.app        1d    
+  frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app       frontend-dhanushxd4s-projects.vercel.app                 4d    
+  frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app       frontend-dhanushxd4-dhanushxd4s-projects.vercel.app      4d    
+  frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app       frontend-chi-blush-72.vercel.app                         4d    
+  edune-2811zty1d-dhanushxd4s-projects.vercel.app          edune-dhanushxd4s-projects.vercel.app                    5d    
+  edune-2811zty1d-dhanushxd4s-projects.vercel.app          edune.vercel.app                                         5d    
+  edune-2811zty1d-dhanushxd4s-projects.vercel.app          edune-git-main-dhanushxd4s-projects.vercel.app           5d    
+  edunex-bfe2-3anx6cyth-dhanushxd4s-projects.vercel.app    edunex-bfe2-dhanushxd4s-projects.vercel.app             29d    
+  edunex-bfe2-3anx6cyth-dhanushxd4s-projects.vercel.app    edunex-bfe2.vercel.app                                  29d    
+  edunex-bfe2-3anx6cyth-dhanushxd4s-projects.vercel.app    edunex-bfe2-git-main-dhanushxd4s-projects.vercel.app    29d    
+  edunex-4q4pbkr81-dhanushxd4s-projects.vercel.app         edunex-dhanushxd4s-projects.vercel.app                  29d    
+  edunex-4q4pbkr81-dhanushxd4s-projects.vercel.app         edunex-rouge.vercel.app                                 29d    
+  edunex-4q4pbkr81-dhanushxd4s-projects.vercel.app         edunex-git-main-dhanushxd4s-projects.vercel.app         29d    
+  edunexxx-p3k2jctxp-dhanushxd4s-projects.vercel.app       edunexxx-git-main-dhanushxd4s-projects.vercel.app       30d    
+  eduunex-3nyhv6rl2-dhanushxd4s-projects.vercel.app        eduunex-git-main-dhanushxd4s-projects.vercel.app        30d    
+  edunexx-p3jeu8v2a-dhanushxd4s-projects.vercel.app        edunexx-git-main-dhanushxd4s-projects.vercel.app        30d    
+
+
+=== Trying edunex.vercel.app ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Assigning alias edunex.vercel.app to frontend-chi-blush-72.vercel.app
+Creating alias
+Error: The chosen alias "edunex.vercel.app" is already in use.
+
+=== Trying edunex-lms.vercel.app ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Assigning alias edunex-lms.vercel.app to frontend-chi-blush-72.vercel.app
+Creating alias
+Error: The chosen alias "edunex-lms.vercel.app" is already in use.
+
+=== Trying edunexapp.vercel.app ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Assigning alias edunexapp.vercel.app to frontend-chi-blush-72.vercel.app
+Creating alias
+> Success! https://edunexapp.vercel.app now points to frontend-chi-blush-72.vercel.app [2s]
+DONE

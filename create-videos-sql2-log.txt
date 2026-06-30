@@ -1,0 +1,16 @@
+--- Content-Type: text/plain ---
+FAILED (400): {"code":"PGRST102","details":null,"hint":null,"message":"Content-Type not acceptable: text/plain"}
+False
+--- Content-Type: application/sql ---
+FAILED (400): {"code":"PGRST102","details":null,"hint":null,"message":"Content-Type not acceptable: application/sql"}
+False
+--- Content-Type: application/json ---
+FAILED (404): {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.sql' in the schema cache"}
+False
+--- Content-Type: application/json ---
+FAILED (404): {"code":"PGRST205","details":null,"hint":null,"message":"Could not find the table 'public.sql' in the schema cache"}
+False
+
+=== Check table via management API ===
+Management API failed (401): 
+DONE

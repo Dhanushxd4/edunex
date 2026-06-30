@@ -1,4 +1,5 @@
 {
+  "alias": ["edunex-dhanush.vercel.app"],
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",

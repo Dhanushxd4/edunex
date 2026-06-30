@@ -1,0 +1,16 @@
+=== Remove broken alias ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Success! Alias edunexapp.vercel.app removed [408ms]
+=== Trying edunex-portal.vercel.app ===
+node.exe : Vercel CLI 54.15.1 (Node.js 24.16.0)
+At C:\Users\admin\AppData\Roaming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Vercel CLI 54.15.1 (Node.js 24.16.0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+> Assigning alias edunex-portal.vercel.app to frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app
+Creating alias
+> Success! https://edunex-portal.vercel.app now points to frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app [3s]
+WINNER: edunex-portal.vercel.app
+DONE

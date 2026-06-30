@@ -60,7 +60,7 @@ router.post('/exams', requireAuth, async (req: AuthRequest, res: Response) => {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
     const topicClause = topic ? ` focusing on the topic: "${topic}"` : ''
     const prompt = `Generate exactly ${count} exam questions for ${subject}, ${cls}, difficulty: ${difficulty}, question types: ${type}, language: ${language}${topicClause}.
@@ -189,21 +189,22 @@ Edunex లో ఈ features ఉన్నాయి: Dashboard, విద్యా�
 
 // POST /api/ai/chat
 router.post('/chat', requireAuth, async (req: AuthRequest, res: Response) => {
+  // Extract message before try so it is accessible in catch fallback
+  const body = req.body as { message?: string; history?: Array<{ role: 'user' | 'model'; text: string }> }
+  const message = (body.message ?? '').trim()
+  const history = body.history ?? []
+
+  if (!message) { res.status(400).json({ success: false, error: 'Message required' }); return }
+
+  const apiKey = process.env.GEMINI_KEY
+  if (!apiKey || apiKey === 'your_gemini_api_key') {
+    res.json({ success: true, data: { reply: 'AI assistant is not configured yet. Please add your Gemini API key.' } })
+    return
+  }
+
   try {
-    const { message, history = [] } = req.body as {
-      message: string
-      history: Array<{ role: 'user' | 'model'; text: string }>
-    }
-    if (!message?.trim()) { res.status(400).json({ success: false, error: 'Message required' }); return }
-
-    const apiKey = process.env.GEMINI_KEY
-    if (!apiKey || apiKey === 'your_gemini_api_key') {
-      res.json({ success: true, data: { reply: 'AI assistant is not configured yet. Please add your Gemini API key.' } })
-      return
-    }
-
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash', systemInstruction: EDUNEX_SYSTEM })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', systemInstruction: EDUNEX_SYSTEM })
 
     const chat = model.startChat({
       history: history.map((h) => ({
@@ -213,10 +214,23 @@ router.post('/chat', requireAuth, async (req: AuthRequest, res: Response) => {
     })
 
     const result = await geminiQueue.run(() => chat.sendMessage(message))
-    const reply  = result.response.text().trim()
+    const response = await result.response
+    const reply = response.text()
+
     res.json({ success: true, data: { reply } })
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Chat failed' })
+  } catch (_geminiErr) {
+  
+    // Fallback: rule-based school assistant when Gemini is unavailable
+    const msg = message.toLowerCase()
+    let reply = 'I am the Edunex AI assistant. I can help with student management, attendance, fees, and more. How can I assist you?'
+    if (msg.includes('student')) reply = 'To add students, go to Students and click Add Student. You can also import students in bulk using the Import Data feature.'
+    else if (msg.includes('teacher')) reply = 'To add teachers, go to Teachers and click Add Teacher. Teachers can be assigned to specific classes and subjects.'
+    else if (msg.includes('fee') || msg.includes('payment')) reply = 'Manage fees in the Fees section. You can track payments, mark fees as paid, and generate reports.'
+    else if (msg.includes('attendance')) reply = 'Record daily attendance in the Attendance section. Select the class and mark each student present or absent.'
+    else if (msg.includes('exam') || msg.includes('question')) reply = 'Generate AI exam papers in the AI Exams section. Select subject, class, difficulty and click Generate.'
+    else if (msg.includes('video')) reply = 'Create AI video announcements in the AI Video section. Upload a photo and add your script, then click Generate AI Video.'
+    else if (msg.includes('admission') || msg.includes('apply')) reply = 'Share the admission form link from Admissions. Applications appear in the Applications tab.'
+    res.json({ success: true, data: { reply } })
   }
 })
 

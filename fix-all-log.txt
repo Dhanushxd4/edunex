@@ -1,0 +1,75 @@
+=== Finding Vercel token ===
+Token file: C:\Users\admin\.vercel\auth.json
+Get-Content : Cannot find path 'C:\Users\admin\.vercel\auth.json' because it does not exist.
+At C:\Users\admin\Downloads\edunex\fix-all.ps1:13 char:13
++ $authJson = Get-Content $tokenFile -Raw | ConvertFrom-Json
++             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\admin\.vercel\auth.json:String) [Get-Content], ItemNotFoundExc 
+   eption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+You cannot call a method on a null-valued expression.
+At C:\Users\admin\Downloads\edunex\fix-all.ps1:15 char:30
++ Write-Output "Token found: $($token.Substring(0,8))..."
++                              ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (:) [], RuntimeException
+    + FullyQualifiedErrorId : InvokeMethodOnNull
+ 
+Token found: ...
+
+=== Disabling deployment protection ===
+Protection API error: {"error":{"code":"forbidden","message":"The request is missing an authentication token","missingToken":true}}
+Trying alternate format...
+Alt also failed: {"error":{"code":"forbidden","message":"The request is missing an authentication token","missingToken":true}}
+
+=== Setting VITE_API_URL on Vercel ===
+Invoke-RestMethod : {"error":{"code":"forbidden","message":"The request is missing an authentication 
+token","missingToken":true}}
+At C:\Users\admin\Downloads\edunex\fix-all.ps1:49 char:17
++ ... stingEnvs = Invoke-RestMethod -Uri $envUrl -Method GET -Headers $head ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+Invoke-RestMethod : {"error":{"code":"forbidden","message":"The request is missing an authentication 
+token","missingToken":true}}
+At C:\Users\admin\Downloads\edunex\fix-all.ps1:66 char:12
++ $addResp = Invoke-RestMethod -Uri $envUrl -Method POST -Headers $head ...
++            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc 
+   eption
+    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand
+VITE_API_URL set:  = 
+
+=== Redeploying frontend ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+Retrieving project…
+Deploying dhanushxd4s-projects/frontend
+Uploading [--------------------] (0.0B/18.7KB)
+Uploading [=================---] (16.0KB/18.7KB)
+Uploading [====================] (18.7KB/18.7KB)
+  Inspect         https://vercel.com/dhanushxd4s-projects/frontend/uvNHQi4UVjFELSgkN6QPriyS5PNJ
+  Production      https://frontend-6q29ckdrg-dhanushxd4s-projects.vercel.app
+https://frontend-6q29ckdrg-dhanushxd4s-projects.vercel.appBuilding…
+Building…
+Running build in Washington, D.C., USA (East) – iad1
+Build machine configuration: 2 cores, 8 GB
+Retrieving list of deployment files...
+Downloading 135 deployment files...
+Restored build cache from previous deployment (7ooD6wRJphDNfYzGb6U8B7uqx4Ms)
+Running "vercel build"
+Vercel CLI 54.17.2
+Installing dependencies...
+up to date in 1s
+72 packages are looking for funding
+run `npm fund` for details
+> frontend@0.0.0 build
+> tsc -b && vite build
+src/pages/super-admin/SuperAdminPage.tsx(6,9): error TS6133: 'X' is declared but its value is never read.
+src/pages/super-admin/SuperAdminPage.tsx(6,12): error TS6133: 'ChevronDown' is declared but its value is never read.
+src/pages/super-admin/SuperAdminPage.tsx(7,35): error TS6133: 'Eye' is declared but its value is never read.
+src/pages/super-admin/SuperAdminPage.tsx(7,40): error TS6133: 'EyeOff' is declared but its value is never read.
+src/pages/super-admin/SuperAdminPage.tsx(88,12): error TS2322: Type '{ children: Element; isOpen: true; onClose: () => void; title: string; size: "lg"; }' is not assignable to type 'IntrinsicAttributes & ModalProps'.
+Property 'isOpen' does not exist on type 'IntrinsicAttributes & ModalProps'. Did you mean 'open'?
+Error: Command "npm run build" exited with 2
+DONE

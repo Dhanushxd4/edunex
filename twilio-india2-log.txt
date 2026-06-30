@@ -1,0 +1,7 @@
+At C:\Users\admin\Downloads\edunex\twilio-india2.ps1:35 char:47
++ Write-Output "=== Verify India permissions ==="
++                                               ~
+The string is missing the terminator: ".
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString
+ 

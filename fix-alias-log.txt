@@ -1,0 +1,50 @@
+=== List deployments ===
+node.exe : Vercel CLI 54.15.1 (Node.js 24.16.0)
+At C:\Users\admin\AppData\Roaming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Vercel CLI 54.15.1 (Node.js 24.16.0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Retrieving project…
+Fetching deployments in dhanushxd4s-projects
+> Deployments for dhanushxd4s-projects/frontend [512ms]
+  Age     Project                           Deployment                                                     Status      
+Environment     Duration     Username       
+  2d      dhanushxd4s-projects/frontend     https://frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      13s          dhanushxd4     
+  2d      dhanushxd4s-projects/frontend     https://frontend-ilxjepji7-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      18s          dhanushxd4     
+  2d      dhanushxd4s-projects/frontend     https://frontend-1fz9rvkrf-dhanushxd4s-projects.vercel.app     ● Error   
+  Production      10s          dhanushxd4     
+  2d      dhanushxd4s-projects/frontend     https://frontend-py1xt6iqr-dhanushxd4s-projects.vercel.app     ● Error   
+  Production      15s          dhanushxd4     
+  3d      dhanushxd4s-projects/frontend     https://frontend-dgxhpjjk2-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      13s          dhanushxd4     
+  3d      dhanushxd4s-projects/frontend     https://frontend-51vy7av8i-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      14s          dhanushxd4     
+  4d      dhanushxd4s-projects/frontend     https://frontend-x1eicmcna-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      15s          dhanushxd4     
+  4d      dhanushxd4s-projects/frontend     https://frontend-1gdtapc9k-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      16s          dhanushxd4     
+  4d      dhanushxd4s-projects/frontend     https://frontend-d7rp0cfbj-dhanushxd4s-projects.vercel.app     ● Ready   
+  Production      19s          dhanushxd4     
+https://frontend-kppmjj3f5-dhanushxd4s-projects.vercel.app
+https://frontend-ilxjepji7-dhanushxd4s-projects.vercel.app
+https://frontend-1fz9rvkrf-dhanushxd4s-projects.vercel.app
+https://frontend-py1xt6iqr-dhanushxd4s-projects.vercel.app
+
+=== Remove wrong alias ===
+Vercel CLI 54.15.1 (Node.js 24.16.0)
+> Success! Alias edunexapp.vercel.app removed [513ms]
+
+=== Get latest deployment URL ===
+node.exe : Vercel CLI 54.15.1 (Node.js 24.16.0)
+At C:\Users\admin\AppData\Roaming\npm\vercel.ps1:24 char:5
++     & "node$exe"  "$basedir/node_modules/vercel/dist/vc.js" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Vercel CLI 54.15.1 (Node.js 24.16.0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Error: unknown or unexpected option: --json
+DONE

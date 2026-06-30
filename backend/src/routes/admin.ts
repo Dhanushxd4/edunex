@@ -38,7 +38,7 @@ router.patch('/schools/:id', requireSuperAdmin, async (req: AuthRequest, res: Re
       .from('schools').update(updates).eq('id', req.params.id).select().single()
     if (error) throw error
     res.json({ success: true, data })
-  } catch { res.status(500).json({ success: false, error: 'Failed to update school' }) }
+  } catch { res.status(500).json({ success: false, error: 'Failed to update school settings' }) }
 })
 
 export default router

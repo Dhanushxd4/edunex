@@ -82,22 +82,33 @@ function pcmToMulaw(buf: Buffer): Buffer {
 // ── System prompt ─────────────────────────────────────────────────────────────
 
 function buildSystemPrompt(ctx: { studentName?: string; callType?: string; schoolName?: string }): string {
-  const school = ctx.schoolName ?? 'Edunex పాఠశాల'
-  const student = ctx.studentName ? `మీరు ${ctx.studentName} యొక్క తల్లిదండ్రులతో మాట్లాడుతున్నారు. ` : ''
+  const school = ctx.schoolName ?? 'Edunex School'
+  const student = ctx.studentName ? `You are speaking with the parents of ${ctx.studentName}. ` : ''
 
-  return `మీరు ${school} యొక్క AI voice assistant — Edunex LMS ద్వారా పని చేస్తున్నారు.
+  return `You are Priya, a warm and friendly voice assistant for ${school}, powered by Edunex LMS.
 ${student}
-మీ పాత్ర:
-- తల్లిదండ్రులకు వినమ్రంగా, స్నేహపూర్వకంగా సహాయం చేయడం
-- హాజరు, ఫీజులు, పరీక్షలు, బస్సు వివరాలు గురించి సమాచారం ఇవ్వడం
-- తెలుగులో మాట్లాడినప్పుడు తెలుగులో జవాబు ఇవ్వడం
-- ఇంగ్లీషులో మాట్లాడినప్పుడు ఇంగ్లీషులో జవాబు ఇవ్వడం
+YOUR PERSONALITY:
+- Sound like a real, caring human staff member — NOT a robot
+- Speak naturally with a warm Indian English accent
+- Use natural phrases like "Sure!", "Of course!", "Let me help you with that", "Absolutely"
+- Add brief natural pauses in long sentences
+- Be conversational — short sentences, easy to understand on a phone call
+- Show empathy: "I understand", "That's a good question"
 
-నియమాలు:
-- చిన్న, స్పష్టమైన వాక్యాలు మాట్లాడండి (phone call కోసం)
-- మీకు తెలియని specifics గురించి పాఠశాల కార్యాలయాన్ని (school office) సంప్రదించమని చెప్పండి
-- మీరు AI అని తెలిసినా, సహాయకారిగా ఉండండి
-- Call type: ${ctx.callType ?? 'general'}`
+YOUR ROLE:
+- Help parents with attendance, fees, exams, bus timings, school updates
+- Answer in Telugu if the parent speaks Telugu, English otherwise
+- If you don't have specific data, say "I'd suggest checking with the school office for exact details"
+
+SPEAKING STYLE (very important):
+- Never sound stiff or robotic
+- Vary your sentence length naturally
+- Use contractions: "I'll", "you'll", "that's", "it's"
+- Occasionally use friendly fillers: "So...", "Well...", "Actually..."
+- Keep responses SHORT for phone calls — 1-3 sentences max per turn
+- Do NOT read out long lists — summarize naturally
+
+Call context: ${ctx.callType ?? 'general inquiry'}`
 }
 
 // ── Voice Agent WebSocket setup ───────────────────────────────────────────────
@@ -145,7 +156,7 @@ export function setupVoiceAgent(server: http.Server): void {
             response_modalities: ['AUDIO'],
             speech_config: {
               voice_config: {
-                prebuilt_voice_config: { voice_name: 'Aoede' }
+                prebuilt_voice_config: { voice_name: 'Puck' }
               }
             }
           },
@@ -211,12 +222,12 @@ export function setupVoiceAgent(server: http.Server): void {
           // Send greeting text once stream is live
           if (geminiWs?.readyState === WebSocket.OPEN) {
             const greet = ctx.studentName
-              ? `నమస్కారం, మీరు ${ctx.studentName} యొక్క తల్లిదండ్రులతో మాట్లాడుతున్నారా? నేను Edunex AI assistant. మీకు ఎలా సహాయం చేయాలి?`
-              : 'నమస్కారం, నేను Edunex school AI assistant. మీకు ఎలా సహాయం చేయాలి?'
+              ? `Greet the parent warmly and naturally. Introduce yourself as Priya from ${ctx.schoolName ?? 'Edunex School'}. Mention you're calling about their child ${ctx.studentName}. Ask how you can help them today. Keep it short and friendly — like a real person would say it on a phone call.`
+              : `Greet the caller warmly and naturally. Introduce yourself as Priya from ${ctx.schoolName ?? 'Edunex School'}. Ask how you can help them today. Keep it short and friendly — like a real person would say it on a phone call.`
 
             geminiWs.send(JSON.stringify({
               client_content: {
-                turns: [{ role: 'user', parts: [{ text: `Please say: "${greet}"` }] }],
+                turns: [{ role: 'user', parts: [{ text: greet }] }],
                 turn_complete: true
               }
             }))
@@ -248,15 +259,17 @@ export function setupVoiceAgent(server: http.Server): void {
           console.log('🎙️ Twilio stream stopped')
           geminiWs?.close()
         }
+      } catch { /* ignore parse errors */ }
+    })
 
-      } catch { /* ignore */ }
+    twilioWs.on('error', (err) => {
+      console.error('WebSocket error:', (err as Error).message)
+      geminiWs?.close()
     })
 
     twilioWs.on('close', () => {
-      console.log('🎙️ Twilio disconnected')
+      console.log('Twilio disconnected')
       geminiWs?.close()
     })
   })
-
-  console.log('🎙️ Voice agent ready at /api/voice-agent/stream')
 }

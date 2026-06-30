@@ -1,0 +1,35 @@
+=== EDUNEX FULL AUDIT 2026-06-28 12:30 ===
+
+HEALTH: 200|{"status":"ok","service":"Edunex API","timestamp":"2026-06-28T07:00:58.170Z","uptime":12048,"memory":"14MB","env":{"twilio":true,"gemini":true,"did":true,"supabase":true}}
+
+LOGIN: 200
+Token OK: eyJhbGciOiJIUzI1NiIsInR5c...
+
+/api/students => HTTP 200
+  {"success":true,"data":[],"meta":{"page":1,"limit":100,"total":0,"pages":0}}
+
+/api/teachers => HTTP 200
+  {"success":true,"data":[],"meta":{"page":1,"limit":100,"total":0,"pages":0}}
+
+/api/dashboard/stats => HTTP 404
+  {"success":false,"error":"Route not found"}
+
+/api/fees => HTTP 200
+  {"success":true,"data":[]}
+
+/api/bus/routes => HTTP 200
+  {"success":true,"data":[]}
+
+/api/enquiries => HTTP 200
+  {"success":true,"data":[]}
+
+/api/parents => HTTP 404
+  {"success":false,"error":"Route not found"}
+
+/api/calls/voice-agent-twiml?type=general => HTTP 200
+  <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://edunex-api-production.up.railway.app/api/voice-agent/stream?type=
+
+=== DONE ===

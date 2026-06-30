@@ -1,0 +1,49 @@
+JWT: FAILED
+
+=== FRONTEND ===
+[OK (200)] Frontend (Vercel) | <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/
+
+=== AUTH ===
+[OK (200)] POST /api/auth/login (superadmin) | {"success":true,"data":{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJzdXBlci1hZG1pbiIsInNjaG9vbElkIjpudW
+[FAIL 401] POST /api/auth/login (bad password) | The remote server returned an error: (401) Unauthorized.
+
+=== DASHBOARD ===
+[FAIL 401] GET /api/dashboard | The remote server returned an error: (401) Unauthorized.
+
+=== STUDENTS ===
+[FAIL 401] GET /api/students | The remote server returned an error: (401) Unauthorized.
+[FAIL 401] GET /api/students?page=1&limit=5 | The remote server returned an error: (401) Unauthorized.
+
+=== TEACHERS ===
+[FAIL 401] GET /api/teachers | The remote server returned an error: (401) Unauthorized.
+
+=== FEES ===
+[FAIL 401] GET /api/fees | The remote server returned an error: (401) Unauthorized.
+
+=== BUS / TRANSPORT ===
+[FAIL 401] GET /api/bus | The remote server returned an error: (401) Unauthorized.
+
+=== ENQUIRIES ===
+[FAIL 401] GET /api/enquiries | The remote server returned an error: (401) Unauthorized.
+
+=== PARENTS ===
+[FAIL 400] POST /api/parents/login (bad) | The remote server returned an error: (400) Bad Request.
+
+=== VOICE AGENT ===
+[OK (200)] GET /api/calls/voice-agent-twiml | <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://edunex-api-production.up.railway.ap
+[OK (200)] GET /api/voice-agent/stream (WS route check) | <?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Connect>
+    <Stream url="wss://edunex-api-production.up.railway.ap
+
+=== HEALTH DETAILS ===
+[OK (200)] GET /health | {"status":"ok","service":"Edunex API","timestamp":"2026-06-28T07:51:02.766Z","uptime":1264,"memory":"15MB","env":{"twili
+
+DONE

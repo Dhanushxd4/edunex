@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create Videos Table — Edunex</title>
+<style>
+body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; background: #0f172a; color: #e2e8f0; }
+h2 { color: #38bdf8; }
+.step { background: #1e293b; border-radius: 8px; padding: 16px; margin: 16px 0; }
+.step h3 { margin: 0 0 8px; color: #94a3b8; font-size: 13px; text-transform: uppercase; }
+pre { background: #0f172a; border: 1px solid #334155; padding: 14px; border-radius: 6px; font-size: 13px; color: #a3e635; overflow-x: auto; white-space: pre-wrap; }
+button { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 8px 4px 0 0; }
+button:hover { background: #0369a1; }
+.green { background: #15803d; }
+.green:hover { background: #166534; }
+#status { margin-top: 12px; padding: 10px; border-radius: 6px; display: none; }
+.ok { background: #14532d; border: 1px solid #16a34a; color: #86efac; }
+</style>
+</head>
+<body>
+<h2>Create Edunex Videos Table</h2>
+<p>The <code>videos</code> table is missing from Supabase. Follow these 2 steps:</p>
+
+<div class="step">
+  <h3>Step 1 — Copy the SQL</h3>
+  <pre id="sql">CREATE TABLE IF NOT EXISTS videos (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  school_id  uuid NOT NULL,
+  title      text NOT NULL,
+  script     text NOT NULL DEFAULT '',
+  presenter  text NOT NULL DEFAULT 'amy',
+  did_id     text NOT NULL DEFAULT '',
+  status     text NOT NULL DEFAULT 'processing',
+  video_url  text DEFAULT '',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_videos_school ON videos (school_id);
+CREATE INDEX IF NOT EXISTS idx_videos_status ON videos (status);</pre>
+  <button onclick="copySql()">Copy SQL</button>
+  <div id="status" class="ok">Copied to clipboard!</div>
+</div>
+
+<div class="step">
+  <h3>Step 2 — Open Supabase SQL Editor and paste</h3>
+  <button class="green" onclick="openSupabase()">Open Supabase SQL Editor</button>
+  <p style="color:#94a3b8; font-size:13px; margin-top:8px;">Paste the SQL there and click <strong>Run</strong>. Done!</p>
+</div>
+
+<script>
+function copySql() {
+  const sql = document.getElementById('sql').textContent;
+  navigator.clipboard.writeText(sql).then(() => {
+    const s = document.getElementById('status');
+    s.style.display = 'block';
+    setTimeout(() => s.style.display = 'none', 2500);
+  });
+}
+function openSupabase() {
+  window.open('https://supabase.com/dashboard/project/qjzfapbkieesjqwosmzb/sql/new', '_blank');
+}
+</script>
+</body>
+</html>
