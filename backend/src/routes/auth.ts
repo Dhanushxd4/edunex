@@ -18,7 +18,7 @@ router.post('/login', async (req: Request, res: Response) => {
     // Super admin shortcut
     if (
       email === 'superadmin@edunex.in' &&
-      password === process.env.SUPER_ADMIN_PASSWORD || password === 'Edunex@2024'
+      (password === process.env.SUPER_ADMIN_PASSWORD || password === 'Edunex@2024')
     ) {
       const token = jwt.sign(
         { userId: 'super-admin', schoolId: null, role: 'super_admin' },
