@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Bot, Clock, Play, Pause, CheckCircle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -25,8 +25,30 @@ const INITIAL_TASKS: AgentTask[] = [
 
 export function AgentPage() {
   const toast = useToast()
-  const [masterOn, setMasterOn] = useState(true)
-  const [tasks, setTasks] = useState<AgentTask[]>(INITIAL_TASKS)
+
+  const [masterOn, setMasterOn] = useState<boolean>(() => {
+    try { return JSON.parse(localStorage.getItem('agent_master') ?? 'true') } catch { return true }
+  })
+  const [tasks, setTasks] = useState<AgentTask[]>(() => {
+    try {
+      const saved = localStorage.getItem('agent_tasks')
+      if (saved) {
+        const savedMap: Record<string, boolean> = JSON.parse(saved)
+        return INITIAL_TASKS.map((t) => ({ ...t, enabled: savedMap[t.id] ?? t.enabled }))
+      }
+    } catch { /* ignore */ }
+    return INITIAL_TASKS
+  })
+
+  useEffect(() => {
+    localStorage.setItem('agent_master', JSON.stringify(masterOn))
+  }, [masterOn])
+
+  useEffect(() => {
+    const map: Record<string, boolean> = {}
+    tasks.forEach((t) => { map[t.id] = t.enabled })
+    localStorage.setItem('agent_tasks', JSON.stringify(map))
+  }, [tasks])
 
   function toggleTask(id: string) {
     setTasks((prev) =>

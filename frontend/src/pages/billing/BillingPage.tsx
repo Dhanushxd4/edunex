@@ -47,7 +47,7 @@ export function BillingPage() {
   const toast = useToast()
 
   function upgrade(planId: string) {
-    toast.info('Redirecting to payment…', `Upgrading to ${planId}`)
+    toast.info('Contact us to upgrade', `To activate the ${planId} plan, please contact Edunex support at support@edunex.in`)
   }
 
   return (

@@ -45,3 +45,14 @@ run-bus-tables.js
 run-parents-table.js
 get-twilio-sid.js
 get-gemini-key.js
+
+# One-off debug/setup scripts — these have historically contained hardcoded
+# API keys (Twilio, Supabase, Gemini). Never commit scripts like this; read
+# credentials from .env instead. Blanket rules below stop new ones from slipping in.
+supabase-keys.txt
+Edunex_Test_Report.html
+*.ps1
+*-log.txt
+call-test.bat
+fix-twilio.bat
+update-railway-vars.bat

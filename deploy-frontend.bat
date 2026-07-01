@@ -1,4 +1,6 @@
 @echo off
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\admin\Downloads\edunex\deploy-frontend.ps1" > "C:\Users\admin\Downloads\edunex\deploy-frontend-log.txt" 2>&1
-echo Done! Check deploy-frontend-log.txt
+echo Deploying frontend to Vercel...
+cd /d "C:\Users\admin\Downloads\edunex\frontend"
+call vercel --prod --yes
+echo Done!
 pause

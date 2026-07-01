@@ -30,4 +30,10 @@ api.interceptors.response.use(
     if (err?.response?.status === 401) {
       localStorage.removeItem('edunex_token')
       localStorage.removeItem('edunex_auth')
-      window.location.href = '/login
+      window.location.href = '/login'
+    }
+    const e = (err?.response?.data ?? {}) as { error?: string; message?: string }
+    const msg = e.error ?? e.message ?? (err as Error).message ?? 'Something went wrong'
+    return Promise.reject(new Error(msg))
+  },
+)

@@ -143,7 +143,7 @@ export function VideoPage() {
 
         {!talkId && (
           <p className="text-xs text-ink-3 text-center mt-2">
-            Requires D-ID API key in backend/.env → DID_KEY
+            Upload a photo and enter a script to generate your AI video announcement
           </p>
         )}
       </Card>
