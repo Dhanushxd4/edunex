@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import axios from 'axios'
 import { requireAuth, type AuthRequest } from '../middleware/auth'
 import { aiQueue, didQueue } from '../lib/queue'
+import { heygenCreateTalkingVideo, heygenCheckStatus, heygenError } from '../lib/heygen'
 
 const router = Router()
 
@@ -191,15 +192,25 @@ function didError(err: unknown): string {
   return err instanceof Error ? err.message : 'Video generation failed'
 }
 
+// Which video provider is active. DID_KEY takes priority (it's the incumbent);
+// set VIDEO_PROVIDER=heygen to force HeyGen even if a D-ID key is present.
+function activeVideoProvider(): 'did' | 'heygen' | null {
+  const didKey    = process.env.DID_KEY
+  const heygenKey = process.env.HEYGEN_KEY
+  const forced    = (process.env.VIDEO_PROVIDER || '').toLowerCase()
+  const didOk     = !!didKey && !didKey.startsWith('your_')
+  const heygenOk  = !!heygenKey && !heygenKey.startsWith('your_')
+  if (forced === 'heygen' && heygenOk) return 'heygen'
+  if (forced === 'did' && didOk) return 'did'
+  if (didOk) return 'did'
+  if (heygenOk) return 'heygen'
+  return null
+}
+
 router.post('/video', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const { photoBase64, script, voice = 'te-IN-ShrutiNeural' } = req.body as {
       photoBase64: string; script: string; voice?: string
-    }
-    const didKey = process.env.DID_KEY
-    if (!didKey || didKey === 'your_did_api_key_base64') {
-      res.status(400).json({ success: false, error: 'D-ID API key not configured.' })
-      return
     }
     if (!photoBase64) {
       res.status(400).json({ success: false, error: 'photoBase64 is required' })
@@ -210,6 +221,26 @@ router.post('/video', requireAuth, async (req: AuthRequest, res: Response) => {
       return
     }
 
+    const provider = activeVideoProvider()
+    if (!provider) {
+      res.status(400).json({ success: false, error: 'No video provider configured. Add DID_KEY or HEYGEN_KEY to backend .env' })
+      return
+    }
+
+    if (provider === 'heygen') {
+      try {
+        const { talkId, status } = await heygenCreateTalkingVideo({
+          photoBase64, script: script.trim(), apiKey: process.env.HEYGEN_KEY!,
+        })
+        // Prefix so GET /video/:id knows which provider to poll
+        res.json({ success: true, data: { talkId: `heygen:${talkId}`, status } })
+      } catch (err) {
+        res.status(500).json({ success: false, error: heygenError(err) })
+      }
+      return
+    }
+
+    const didKey = process.env.DID_KEY!
     const DID_HEADERS = {
       Authorization: `Basic ${didKey}`,
       'Content-Type': 'application/json',
@@ -252,7 +283,20 @@ router.post('/video', requireAuth, async (req: AuthRequest, res: Response) => {
 
 router.get('/video/:id', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params
+    const id = String(req.params.id)
+
+    if (id.startsWith('heygen:')) {
+      const videoId = id.slice('heygen:'.length)
+      try {
+        const { status, videoUrl } = await heygenCheckStatus(videoId, process.env.HEYGEN_KEY!)
+        // Normalize HeyGen's 'completed'/'failed' to the same shape the frontend expects from D-ID
+        res.json({ success: true, data: { status: status === 'completed' ? 'done' : status, videoUrl } })
+      } catch (err) {
+        res.status(500).json({ success: false, error: heygenError(err) })
+      }
+      return
+    }
+
     const didKey = process.env.DID_KEY
     const response = await axios.get(`https://api.d-id.com/talks/${id}`, {
       headers: {

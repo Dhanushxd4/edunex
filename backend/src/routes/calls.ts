@@ -1,18 +1,12 @@
 import { Router, type Request, type Response } from 'express'
-import twilio from 'twilio'
 import { requireAuth, type AuthRequest } from '../middleware/auth'
 import { supabase } from '../lib/supabase'
+import { makeVoiceCall, sendSms, getCallProvider } from '../lib/calling'
 
 const router = Router()
 
-function getTwilioClient() {
-  const sid   = process.env.TWILIO_SID!
-  const token = process.env.TWILIO_TOKEN!
-  if (!sid || !token || sid === 'your_twilio_account_sid') {
-    throw new Error('Twilio credentials not configured. Add TWILIO_SID and TWILIO_TOKEN to backend .env')
-  }
-  return twilio(sid, token)
-}
+// getTwilioClient() removed — calling.ts now abstracts Twilio/Exotel behind
+// makeVoiceCall()/sendSms(). Set CALL_PROVIDER=exotel in .env to switch.
 
 function sanitizePhone(phone: string): string {
   const digits = phone.replace(/\D/g, '').slice(-10)
@@ -68,16 +62,15 @@ router.post('/make', requireAuth, async (req: AuthRequest, res: Response) => {
 
     const callScript = script || defaultScripts[type] || defaultScripts.absent
 
-    const client = getTwilioClient()
-    const call = await client.calls.create({
+    const call = await makeVoiceCall({
       from: fromNumber,
       to:   sanitizePhone(phone),
-      twiml: `<Response><Say language="te-IN" voice="Google.te-IN-Standard-A">${callScript}</Say></Response>`,
-      timeout:   30,
-      timeLimit: callDuration,
+      script: callScript,
+      timeoutSec: 30,
+      timeLimitSec: callDuration,
     })
 
-    // Log to database
+    // Log to database (twilio_sid column now holds either provider's call SID)
     await supabase.from('calls').insert({
       school_id:   req.schoolId!,
       student_id:  null,
@@ -89,7 +82,7 @@ router.post('/make', requireAuth, async (req: AuthRequest, res: Response) => {
       called_at:    new Date().toISOString(),
     })
 
-    res.json({ success: true, data: { sid: call.sid, status: call.status } })
+    res.json({ success: true, data: { sid: call.sid, status: call.status, provider: call.provider } })
   } catch (err) {
     res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'Call failed' })
   }
@@ -113,14 +106,9 @@ router.post('/sms', requireAuth, async (req: AuthRequest, res: Response) => {
 
     const fromNumber = school?.twilio_number || process.env.TWILIO_NUMBER!
 
-    const client = getTwilioClient()
-    const msg = await client.messages.create({
-      from: fromNumber,
-      to:   sanitizePhone(phone),
-      body: message,
-    })
+    const msg = await sendSms({ from: fromNumber, to: sanitizePhone(phone), message })
 
-    res.json({ success: true, data: { sid: msg.sid, status: msg.status } })
+    res.json({ success: true, data: { sid: msg.sid, status: msg.status, provider: msg.provider } })
   } catch (err) {
     res.status(500).json({ success: false, error: err instanceof Error ? err.message : 'SMS failed' })
   }
@@ -193,9 +181,8 @@ router.post('/broadcast', requireAuth, async (req: AuthRequest, res: Response) =
     const schoolName = school?.name || 'Your School'
 
     let sent = 0
-    const client = getTwilioClient()
 
-    // Fire calls in batches of 5 (Twilio rate limit)
+    // Fire calls in batches of 5 (rate-limit friendly for both Twilio and Exotel)
     const chunks: typeof students[] = []
     for (let i = 0; i < students.length; i += 5) chunks.push(students.slice(i, i + 5))
 
@@ -205,11 +192,11 @@ router.post('/broadcast', requireAuth, async (req: AuthRequest, res: Response) =
           try {
             if (channel === 'call' || channel === 'both') {
               const script = `${message} - This message is from ${schoolName}.`
-              await client.calls.create({
+              await makeVoiceCall({
                 from: fromNumber,
                 to: sanitizePhone(student.phone),
-                twiml: `<Response><Say language="te-IN" voice="Google.te-IN-Standard-A">${script}</Say></Response>`,
-                timeout: 30,
+                script,
+                timeoutSec: 30,
               })
             }
             sent++
@@ -225,6 +212,11 @@ router.post('/broadcast', requireAuth, async (req: AuthRequest, res: Response) =
 })
 
 // ── AI Voice Agent ────────────────────────────────────────────────────────────
+// NOTE: the real-time two-way agent below stays on Twilio regardless of
+// CALL_PROVIDER. It relies on Twilio's Media Streams WebSocket protocol
+// (see lib/../routes/voice-agent.ts). Exotel has an equivalent (AgentStream,
+// currently beta) but its message format differs and hasn't been ported —
+// migrating this specific feature is a separate, bigger job.
 
 // POST /api/calls/voice-agent — initiate outbound AI conversation call
 router.post('/voice-agent', requireAuth, async (req: AuthRequest, res: Response) => {
@@ -238,7 +230,14 @@ router.post('/voice-agent', requireAuth, async (req: AuthRequest, res: Response)
       return
     }
 
-    const client = getTwilioClient()
+    const sid   = process.env.TWILIO_SID!
+    const token = process.env.TWILIO_TOKEN!
+    if (!sid || !token || sid.startsWith('your_')) {
+      res.status(400).json({ success: false, error: 'Twilio credentials required for the real-time voice agent (Exotel not yet supported for this feature)' })
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const client = require('twilio')(sid, token)
 
     const { data: school } = await supabase
       .from('schools')
@@ -294,6 +293,22 @@ router.get('/voice-agent-twiml', (req: Request, res: Response) => {
 router.post('/voice-agent-status', (req: Request, res: Response) => {
   console.log('📞 Voice agent call status:', req.body?.CallStatus, req.body?.CallSid)
   res.sendStatus(200)
+})
+
+// ── Exotel dynamic TTS text ────────────────────────────────────────────────────
+// GET /api/calls/exotel-tts — Exotel's Connect/Greeting applet fetches plain
+// text from this URL and reads it out via their TTS engine. Point your Exotel
+// Flow's "Read text like a robot" (URL option) here. See lib/calling.ts for
+// the one-time Exotel dashboard setup this depends on.
+router.get('/exotel-tts', (req: Request, res: Response) => {
+  const script = (req.query.script as string) || 'Hello, this is a message from your school.'
+  res.set('Content-Type', 'text/plain')
+  res.send(script)
+})
+
+// GET /api/calls/provider — which calling provider is currently active (for the frontend settings UI)
+router.get('/provider', requireAuth, (_req: AuthRequest, res: Response) => {
+  res.json({ success: true, data: { provider: getCallProvider() } })
 })
 
 export default router
